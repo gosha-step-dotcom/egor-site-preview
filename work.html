@@ -1,4 +1,57 @@
 <!DOCTYPE html><html lang="ru" data-page-theme="dark"> <head><meta name="robots" content="noindex, nofollow"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Работы — витрина эффектов — Егор</title><meta name="description" content="Эффекты, которые я встраиваю в сайты. Каждый блок на этой странице живой: наведите курсор, прокрутите, нажмите. Понравился — встрою в ваш сайт."><meta name="theme-color" content="#0B0C0E"><link rel="icon" href="./favicon.svg" type="image/svg+xml"><meta property="og:type" content="website"><meta property="og:locale" content="ru_RU"><meta property="og:site_name" content="Егор"><meta property="og:title" content="Работы — витрина эффектов — Егор"><meta property="og:description" content="Эффекты, которые я встраиваю в сайты. Каждый блок на этой странице живой: наведите курсор, прокрутите, нажмите. Понравился — встрою в ваш сайт."><meta property="og:image" content="./media/og.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Работы — витрина эффектов — Егор"><meta name="twitter:image" content="./media/og.jpg"><meta name="twitter:description" content="Эффекты, которые я встраиваю в сайты. Каждый блок на этой странице живой: наведите курсор, прокрутите, нажмите. Понравился — встрою в ваш сайт."><script>
+      // Отладка на телефоне: адрес с ?debug — внизу экрана панель с ошибками и данными о WebGL.
+      (function () {
+        if (!/[?&]debug/.test(location.search)) return;
+        var lines = [];
+        var box;
+        function show() {
+          if (!box) {
+            box = document.createElement('pre');
+            box.style.cssText = 'position:fixed;left:0;right:0;bottom:0;max-height:45vh;overflow:auto;z-index:2147483647;margin:0;padding:8px;background:rgba(0,0,0,.88);color:#c8ff3a;font:11px/1.35 monospace;white-space:pre-wrap;word-break:break-all;pointer-events:auto';
+            (document.body || document.documentElement).appendChild(box);
+          }
+          box.textContent = lines.join('\n');
+        }
+        function add(t) {
+          lines.push(((performance.now() / 1000) | 0) + 's ' + t);
+          if (lines.length > 80) lines.shift();
+          if (document.body) show();
+        }
+        window.__dbg = add;
+        window.addEventListener('error', function (e) { add('ERROR ' + (e.message || e) + ' @' + (e.filename || '').split('/').pop() + ':' + e.lineno + ':' + e.colno); });
+        window.addEventListener('unhandledrejection', function (e) { add('REJECT ' + (e.reason && (e.reason.message || e.reason)) + ' ' + ((e.reason && e.reason.stack) || '').slice(0, 300)); });
+        ['error', 'warn', 'info'].forEach(function (k) {
+          var o = console[k];
+          console[k] = function () {
+            try { add(k.toUpperCase() + ' ' + Array.prototype.map.call(arguments, function (a) { return a && a.stack ? a.message + ' ' + a.stack.slice(0, 300) : String(a); }).join(' ').slice(0, 600)); } catch (_) {}
+            return o.apply(console, arguments);
+          };
+        });
+        add(navigator.userAgent);
+        document.addEventListener('DOMContentLoaded', function () {
+          try {
+            var c = document.createElement('canvas');
+            var g = c.getContext('webgl2');
+            if (!g) add('WEBGL2: нет');
+            else {
+              var d = g.getExtension('WEBGL_debug_renderer_info');
+              add('GPU ' + (d ? g.getParameter(d.UNMASKED_RENDERER_WEBGL) : '?'));
+              add('EXT_color_buffer_float=' + !!g.getExtension('EXT_color_buffer_float') + ' half=' + !!g.getExtension('EXT_color_buffer_half_float') + ' float_linear=' + !!g.getExtension('OES_texture_float_linear') + ' maxTex=' + g.getParameter(g.MAX_TEXTURE_SIZE));
+            }
+          } catch (e) { add('GL check failed ' + e); }
+          var gl = document.getElementById('gl');
+          if (gl) {
+            gl.addEventListener('webglcontextlost', function () { add('WEBGL CONTEXT LOST'); });
+            gl.addEventListener('webglcontextrestored', function () { add('webgl context restored'); });
+          }
+          show();
+        });
+        setInterval(function () {
+          var h = document.documentElement;
+          add('state: loading=' + h.classList.contains('is-loading') + ' nogl=' + h.classList.contains('no-gl') + ' preloaded=' + (h.dataset.preloaded || '-') + ' y=' + (window.scrollY | 0));
+        }, 4000);
+      })();
+    </script><script>
       // Один раз: включаем «режим JS» и экран загрузки. Без JS страница полностью видна.
       (function () {
         if (window.__booted) return;
